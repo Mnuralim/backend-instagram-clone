@@ -1,20 +1,27 @@
-// import multer from "multer";
+import multer, { Multer } from 'multer';
+import { Request } from 'express';
+import ApiError from '../utils/apiError';
 
-// const storage = multer.diskStorage({});
+const multerFiltering = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+  if (
+    file.mimetype == 'image/png' ||
+    file.mimetype == 'image/jpg' ||
+    file.mimetype == 'image/jpeg' ||
+    file.mimetype == 'video/mp4' ||
+    file.mimetype == 'video/webm'
+  ) {
+    cb(null, true);
+  } else {
+    // @ts-ignore
+    return cb(new ApiError('Wrong file format', 400), false);
+  }
+};
 
-// export const upload = multer({
-//   storage: storage,
+const upload: Multer = multer({
+  fileFilter: multerFiltering,
+  limits: {
+    fileSize: 5000000,
+  },
+});
 
-//   limits: {
-//     fileSize: 5000000,
-//   },
-// }).fields([
-//   {
-//     name: "audio",
-//     maxCount: 1,
-//   },
-//   {
-//     name: "image",
-//     maxCount: 1,
-//   },
-// ]);
+export default upload;
