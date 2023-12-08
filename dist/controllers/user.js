@@ -20,7 +20,7 @@ const getAllUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     const { suggestion, username } = req.query;
     try {
         let suggestionOpt = false;
-        if (suggestion === "true") {
+        if (suggestion === 'true') {
             suggestionOpt = true;
         }
         else {
@@ -28,15 +28,20 @@ const getAllUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         }
         const filterData = {};
         if (username) {
-            filterData.username = { $regex: ".*" + username + ".*", $options: "i" };
+            filterData.username = { $regex: '.*' + username + '.*', $options: 'i' };
         }
-        const users = yield user_1.default.find(filterData).select("-password -refreshToken -passwordResetExpires -passwordResetToken -__v");
+        const users = yield user_1.default.find(filterData).select('-password -refreshToken -passwordResetExpires -passwordResetToken -__v');
         const allUsers = users
             .map((user) => {
             const alreadyFollow = user.follower.find((el) => { var _a; return el.toString() === ((_a = req.user._id) === null || _a === void 0 ? void 0 : _a.toString()); });
             return Object.assign(Object.assign({}, user.toObject()), { alreadyFollow: alreadyFollow ? true : false });
         })
-            .filter((user) => { var _a, _b; return (suggestionOpt ? user._id.toString() !== ((_a = req.user._id) === null || _a === void 0 ? void 0 : _a.toString()) && user.alreadyFollow === false : user._id.toString() !== ((_b = req.user._id) === null || _b === void 0 ? void 0 : _b.toString())); });
+            .filter((user) => {
+            var _a, _b;
+            return suggestionOpt
+                ? user._id.toString() !== ((_a = req.user._id) === null || _a === void 0 ? void 0 : _a.toString()) && user.alreadyFollow === false
+                : user._id.toString() !== ((_b = req.user._id) === null || _b === void 0 ? void 0 : _b.toString());
+        });
         res.status(200).json({
             success: true,
             data: {
@@ -52,7 +57,7 @@ exports.getAllUsers = getAllUsers;
 const getUserById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     try {
-        const user = (yield user_1.default.findById(id).select("-password -refreshToken -passwordResetExpires -passwordResetToken -__v"));
+        const user = (yield user_1.default.findById(id).select('-password -refreshToken -passwordResetExpires -passwordResetToken -__v'));
         const alreadyFollow = user.follower.find((el) => { var _a; return el.toString() === ((_a = req.user._id) === null || _a === void 0 ? void 0 : _a.toString()); });
         res.status(200).json({
             success: true,
@@ -73,18 +78,18 @@ const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         const user = (yield user_1.default.findById(_id));
         const findUsername = (yield user_1.default.findOne({ username }));
         if (!user)
-            return next(new apiError_1.default("User not found", 404));
+            return next(new apiError_1.default('User not found', 404));
         if (findUsername && findUsername.username !== user.username)
-            return next(new apiError_1.default("Username already taken", 404));
+            return next(new apiError_1.default('Username already taken', 404));
         const file = req.file;
-        let imgUrl = "";
+        let imgUrl = '';
         if (file) {
-            const split = file.originalname.split(".");
+            const split = file.originalname.split('.');
             const ext = split[split.length - 1];
             const uploadedImage = yield imagekit_1.default.upload({
                 file: file.buffer,
                 fileName: `IMG-USER-PROFILE${Date.now()}.${ext}`,
-                folder: "instagram-clone/user_profile",
+                folder: 'instagram-clone/user_profile',
             });
             imgUrl = uploadedImage.url;
         }
@@ -99,7 +104,7 @@ const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         yield user.save();
         res.status(201).json({
             success: true,
-            message: "Updated user successfully",
+            message: 'Updated user successfully',
         });
     }
     catch (error) {
@@ -110,9 +115,9 @@ exports.updateUser = updateUser;
 const getUserByEmail = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { email } = req.params;
     try {
-        const user = yield user_1.default.findOne({ email }).select("-password -refreshToken -passwordResetExpires -passwordResetToken -__v");
+        const user = yield user_1.default.findOne({ email }).select('-password -refreshToken -passwordResetExpires -passwordResetToken -__v');
         if (!user)
-            return next(new apiError_1.default("User not found", 404));
+            return next(new apiError_1.default('User not found', 404));
         res.status(200).json({
             success: true,
             data: {
@@ -132,11 +137,11 @@ const followUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         const currentUser = yield user_1.default.findById(currentUserId);
         const targetUser = yield user_1.default.findById(targetUserId);
         if (!currentUser || !targetUser)
-            return next(new apiError_1.default("User not found", 404));
+            return next(new apiError_1.default('User not found', 404));
         if (currentUser._id.toString() === targetUser._id.toString())
-            return next(new apiError_1.default("You cannot follow or unfollow yourself", 400));
+            return next(new apiError_1.default('You cannot follow or unfollow yourself', 400));
         const alreadyFollow = currentUser.following.find((data) => data.toString() === targetUser._id.toString());
-        let message = "";
+        let message = '';
         if (!alreadyFollow) {
             currentUser.following.push(targetUser._id);
             targetUser.follower.push(currentUser._id);
@@ -145,7 +150,7 @@ const followUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             targetUser.totalFollower = targetUser.follower.length;
             yield currentUser.save();
             yield targetUser.save();
-            message = "You are follow this user";
+            message = 'You are follow this user';
         }
         else {
             // @ts-ignore
@@ -157,7 +162,7 @@ const followUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             targetUser.totalFollower = targetUser.follower.length;
             yield currentUser.save();
             yield targetUser.save();
-            message = "You are unfollow this user";
+            message = 'You are unfollow this user';
         }
         res.status(200).json({
             success: true,

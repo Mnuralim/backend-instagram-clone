@@ -1,5 +1,5 @@
-import mongoose, { Schema } from "mongoose";
-import { IUser } from "../../types";
+import mongoose, { Schema } from 'mongoose';
+import { IUser } from '../../types';
 
 const userSchema = new mongoose.Schema<IUser>(
   {
@@ -22,33 +22,34 @@ const userSchema = new mongoose.Schema<IUser>(
     profile: {
       fullName: {
         type: String,
+        default: '',
       },
       birth: Date,
       address: String,
       gender: String,
       imageProfile: {
         type: String,
-        default: "https://www.pngfind.com/pngs/m/676-6764065_default-profile-picture-transparent-hd-png-download.png",
+        default: 'https://ik.imagekit.io/ku9epk6lrv/user%20(1).png?updatedAt=1701280630365',
       },
       bio: {
         type: String,
-        default: "",
+        default: '',
       },
       link: {
         type: String,
-        default: "",
+        default: '',
       },
     },
     follower: [
       {
         type: Schema.Types.ObjectId,
-        ref: "User",
+        ref: 'User',
       },
     ],
     following: [
       {
         type: Schema.Types.ObjectId,
-        ref: "User",
+        ref: 'User',
       },
     ],
     totalFollower: {
@@ -82,6 +83,6 @@ const userSchema = new mongoose.Schema<IUser>(
   }
 );
 
-const User = mongoose.model<IUser>("User", userSchema);
+const User = mongoose.model<IUser>('User', userSchema);
 
 export default User;

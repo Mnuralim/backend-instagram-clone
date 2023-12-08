@@ -44,33 +44,34 @@ const userSchema = new mongoose_1.default.Schema({
     profile: {
         fullName: {
             type: String,
+            default: '',
         },
         birth: Date,
         address: String,
         gender: String,
         imageProfile: {
             type: String,
-            default: "https://www.pngfind.com/pngs/m/676-6764065_default-profile-picture-transparent-hd-png-download.png",
+            default: 'https://ik.imagekit.io/ku9epk6lrv/user%20(1).png?updatedAt=1701280630365',
         },
         bio: {
             type: String,
-            default: "",
+            default: '',
         },
         link: {
             type: String,
-            default: "",
+            default: '',
         },
     },
     follower: [
         {
             type: mongoose_1.Schema.Types.ObjectId,
-            ref: "User",
+            ref: 'User',
         },
     ],
     following: [
         {
             type: mongoose_1.Schema.Types.ObjectId,
-            ref: "User",
+            ref: 'User',
         },
     ],
     totalFollower: {
@@ -100,5 +101,5 @@ const userSchema = new mongoose_1.default.Schema({
 }, {
     timestamps: true,
 });
-const User = mongoose_1.default.model("User", userSchema);
+const User = mongoose_1.default.model('User', userSchema);
 exports.default = User;

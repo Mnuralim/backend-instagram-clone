@@ -1,14 +1,14 @@
-import { NextFunction, Request, Response } from "express";
-import User from "../models/user";
-import ApiError from "../utils/apiError";
-import imagekit from "../utils/imagekit";
-import { IUser } from "../../types";
+import { NextFunction, Request, Response } from 'express';
+import User from '../models/user';
+import ApiError from '../utils/apiError';
+import imagekit from '../utils/imagekit';
+import { IUser } from '../../types';
 
 export const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
   const { suggestion, username } = req.query;
   try {
     let suggestionOpt = false;
-    if (suggestion === "true") {
+    if (suggestion === 'true') {
       suggestionOpt = true;
     } else {
       suggestionOpt = false;
@@ -17,16 +17,22 @@ export const getAllUsers = async (req: Request, res: Response, next: NextFunctio
     const filterData = {} as { username: any };
 
     if (username) {
-      filterData.username = { $regex: ".*" + username + ".*", $options: "i" };
+      filterData.username = { $regex: '.*' + username + '.*', $options: 'i' };
     }
 
-    const users: IUser[] = await User.find(filterData).select("-password -refreshToken -passwordResetExpires -passwordResetToken -__v");
+    const users: IUser[] = await User.find(filterData).select(
+      '-password -refreshToken -passwordResetExpires -passwordResetToken -__v'
+    );
     const allUsers = users
       .map((user) => {
         const alreadyFollow = user.follower.find((el) => el.toString() === req.user._id?.toString());
         return { ...user.toObject(), alreadyFollow: alreadyFollow ? true : false };
       })
-      .filter((user) => (suggestionOpt ? user._id.toString() !== req.user._id?.toString() && user.alreadyFollow === false : user._id.toString() !== req.user._id?.toString()));
+      .filter((user) =>
+        suggestionOpt
+          ? user._id.toString() !== req.user._id?.toString() && user.alreadyFollow === false
+          : user._id.toString() !== req.user._id?.toString()
+      );
 
     res.status(200).json({
       success: true,
@@ -42,7 +48,9 @@ export const getAllUsers = async (req: Request, res: Response, next: NextFunctio
 export const getUserById = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   try {
-    const user = (await User.findById(id).select("-password -refreshToken -passwordResetExpires -passwordResetToken -__v")) as IUser;
+    const user = (await User.findById(id).select(
+      '-password -refreshToken -passwordResetExpires -passwordResetToken -__v'
+    )) as IUser;
     const alreadyFollow = user.follower.find((el) => el.toString() === req.user._id?.toString());
     res.status(200).json({
       success: true,
@@ -65,19 +73,21 @@ export const updateUser = async (req: Request, res: Response, next: NextFunction
   try {
     const user = (await User.findById(_id)) as IUser;
     const findUsername = (await User.findOne({ username })) as IUser;
-    if (!user) return next(new ApiError("User not found", 404));
-    if (findUsername && findUsername.username !== user.username) return next(new ApiError("Username already taken", 404));
+    if (!user) return next(new ApiError('User not found', 404));
+
+    if (findUsername && findUsername.username !== user.username)
+      return next(new ApiError('Username already taken', 404));
 
     const file = req.file;
-    let imgUrl: string = "";
+    let imgUrl: string = '';
     if (file) {
-      const split = file.originalname.split(".");
+      const split = file.originalname.split('.');
       const ext = split[split.length - 1];
 
       const uploadedImage = await imagekit.upload({
         file: file.buffer,
         fileName: `IMG-USER-PROFILE${Date.now()}.${ext}`,
-        folder: "instagram-clone/user_profile",
+        folder: 'instagram-clone/user_profile',
       });
       imgUrl = uploadedImage.url;
     } else {
@@ -94,7 +104,7 @@ export const updateUser = async (req: Request, res: Response, next: NextFunction
 
     res.status(201).json({
       success: true,
-      message: "Updated user successfully",
+      message: 'Updated user successfully',
     });
   } catch (error: any) {
     next(new ApiError(error.message, 500));
@@ -105,8 +115,10 @@ export const getUserByEmail = async (req: Request, res: Response, next: NextFunc
   const { email } = req.params;
 
   try {
-    const user: IUser = await User.findOne({ email }).select("-password -refreshToken -passwordResetExpires -passwordResetToken -__v");
-    if (!user) return next(new ApiError("User not found", 404));
+    const user: IUser = await User.findOne({ email }).select(
+      '-password -refreshToken -passwordResetExpires -passwordResetToken -__v'
+    );
+    if (!user) return next(new ApiError('User not found', 404));
 
     res.status(200).json({
       success: true,
@@ -127,12 +139,13 @@ export const followUser = async (req: Request, res: Response, next: NextFunction
     const currentUser = await User.findById(currentUserId);
     const targetUser = await User.findById(targetUserId);
 
-    if (!currentUser || !targetUser) return next(new ApiError("User not found", 404));
-    if (currentUser._id.toString() === targetUser._id.toString()) return next(new ApiError("You cannot follow or unfollow yourself", 400));
+    if (!currentUser || !targetUser) return next(new ApiError('User not found', 404));
+    if (currentUser._id.toString() === targetUser._id.toString())
+      return next(new ApiError('You cannot follow or unfollow yourself', 400));
 
     const alreadyFollow = currentUser.following.find((data) => data.toString() === targetUser._id.toString());
 
-    let message = "";
+    let message = '';
     if (!alreadyFollow) {
       currentUser.following.push(targetUser._id);
       targetUser.follower.push(currentUser._id);
@@ -143,7 +156,7 @@ export const followUser = async (req: Request, res: Response, next: NextFunction
 
       await currentUser.save();
       await targetUser.save();
-      message = "You are follow this user";
+      message = 'You are follow this user';
     } else {
       // @ts-ignore
       currentUser.following.pull(targetUser._id);
@@ -156,7 +169,7 @@ export const followUser = async (req: Request, res: Response, next: NextFunction
 
       await currentUser.save();
       await targetUser.save();
-      message = "You are unfollow this user";
+      message = 'You are unfollow this user';
     }
     res.status(200).json({
       success: true,
