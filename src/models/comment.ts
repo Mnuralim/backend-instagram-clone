@@ -1,21 +1,21 @@
-import mongoose, { Schema } from "mongoose";
-import { IComment } from "../../types";
+import mongoose, { Schema } from 'mongoose'
+import { type IComment } from '../../types'
 
 const commentSchema = new mongoose.Schema<IComment>(
   {
     post: {
       type: Schema.Types.ObjectId,
-      ref: "Post",
-      required: true,
+      ref: 'Post',
+      required: true
     },
     text: {
       type: String,
-      required: true,
+      required: true
     },
     user: {
       type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+      ref: 'User',
+      required: true
     },
     replies:
       [
@@ -23,16 +23,16 @@ const commentSchema = new mongoose.Schema<IComment>(
           text: String,
           user: {
             type: Schema.Types.ObjectId,
-            ref: "User",
-          },
-        },
-      ] || [],
+            ref: 'User'
+          }
+        }
+      ] || []
   },
   {
-    timestamps: true,
+    timestamps: true
   }
-);
+)
 
-const Comment = mongoose.model<IComment>("Comment", commentSchema);
+const Comment = mongoose.model<IComment>('Comment', commentSchema)
 
-export default Comment;
+export default Comment

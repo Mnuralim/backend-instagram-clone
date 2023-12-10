@@ -8,5 +8,5 @@ module.exports = {
   clearMocks: true,
   detectOpenHandles: true,
   coverageDirectory: 'coverage',
-  collectCoverage: true,
-};
+  collectCoverage: true
+}

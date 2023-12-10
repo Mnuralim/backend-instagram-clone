@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const authentication_1 = __importDefault(require("../middleware/authentication"));
+const uploadFile_1 = __importDefault(require("../middleware/uploadFile"));
+const validation_1 = __importDefault(require("../middleware/validation"));
+const post_1 = require("../controllers/post");
+const router = express_1.default.Router();
+router.patch('/likes/:id', authentication_1.default, (0, validation_1.default)('post'), post_1.likePost);
+router.get('/likes/:id', authentication_1.default, (0, validation_1.default)('post'), post_1.getAllLikes);
+router.post('/', authentication_1.default, uploadFile_1.default.single('media'), post_1.createPost);
+router.get('/', authentication_1.default, post_1.getAllPost);
+router.get('/:id', authentication_1.default, (0, validation_1.default)('post'), post_1.getPostById);
+router.delete('/:id', authentication_1.default, (0, validation_1.default)('post'), post_1.deletePost);
+router.patch('/:id', authentication_1.default, (0, validation_1.default)('post'), post_1.updatePost);
+const PostRouter = router;
+exports.default = PostRouter;

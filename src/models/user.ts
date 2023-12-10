@@ -1,88 +1,88 @@
-import mongoose, { Schema } from 'mongoose';
-import { IUser } from '../../types';
+import mongoose, { Schema } from 'mongoose'
+import { type IUser } from '../../types'
 
 const userSchema = new mongoose.Schema<IUser>(
   {
     username: {
       type: String,
       required: true,
-      unique: true,
+      unique: true
     },
     email: {
       type: String,
       required: true,
-      unique: true,
+      unique: true
     },
     mobile: {
-      type: String,
+      type: String
     },
     password: {
-      type: String,
+      type: String
     },
     profile: {
       fullName: {
         type: String,
-        default: '',
+        default: ''
       },
       birth: Date,
       address: String,
       gender: String,
       imageProfile: {
         type: String,
-        default: 'https://ik.imagekit.io/ku9epk6lrv/user%20(1).png?updatedAt=1701280630365',
+        default: 'https://ik.imagekit.io/ku9epk6lrv/user%20(1).png?updatedAt=1701280630365'
       },
       bio: {
         type: String,
-        default: '',
+        default: ''
       },
       link: {
         type: String,
-        default: '',
-      },
+        default: ''
+      }
     },
     follower: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'User',
-      },
+        ref: 'User'
+      }
     ],
     following: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'User',
-      },
+        ref: 'User'
+      }
     ],
     totalFollower: {
       type: Number,
-      default: 0,
+      default: 0
     },
 
     totalFollowing: {
       type: Number,
-      default: 0,
+      default: 0
     },
     totalPost: {
       type: Number,
-      default: 0,
+      default: 0
     },
     refreshToken: {
       type: String || null,
-      default: null,
+      default: null
     },
     passwordResetExp: {
-      type: Date,
+      type: Date
     },
     passwordResetToken: {
       type: String || null,
-      default: null,
+      default: null
     },
-    passwordUpdatedAt: Date,
+    passwordUpdatedAt: Date
   },
   {
-    timestamps: true,
+    timestamps: true
   }
-);
+)
 
-const User = mongoose.model<IUser>('User', userSchema);
+const User = mongoose.model<IUser>('User', userSchema)
 
-export default User;
+export default User

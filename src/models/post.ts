@@ -1,46 +1,46 @@
-import mongoose, { Schema } from "mongoose";
-import { IPost } from "../../types";
+import mongoose, { Schema } from 'mongoose'
+import { type IPost } from '../../types'
 
 const postSchema = new mongoose.Schema<IPost>(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+      ref: 'User',
+      required: true
     },
     caption: {
       type: String,
-      required: true,
+      required: true
     },
     media: {
       type: String,
-      required: true,
+      required: true
     },
     likedBy: [
       {
         type: Schema.Types.ObjectId,
-        ref: "User",
-      },
+        ref: 'User'
+      }
     ],
     totalLike: {
       type: Number,
-      default: 0,
+      default: 0
     },
     totalComment: {
       type: Number,
-      default: 0,
+      default: 0
     },
     type: {
       type: String,
-      enum: ["post", "reel"],
-      default: "post",
-    },
+      enum: ['post', 'reel'],
+      default: 'post'
+    }
   },
   {
-    timestamps: true,
+    timestamps: true
   }
-);
+)
 
-const Post = mongoose.model("Post", postSchema);
+const Post = mongoose.model('Post', postSchema)
 
-export default Post;
+export default Post

@@ -1,11 +1,12 @@
-import ImageKit from "imagekit";
-import dotenv from "dotenv";
-dotenv.config();
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import ImageKit from 'imagekit'
+import dotenv from 'dotenv'
+dotenv.config()
 
 const imagekit = new ImageKit({
-  publicKey: process.env.IMAGEKIT_PUBLIC_KEY as string,
-  privateKey: process.env.IMAGEKIT_PRIVATE_KEY as string,
-  urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT as string,
-});
+  publicKey: process.env.IMAGEKIT_PUBLIC_KEY!,
+  privateKey: process.env.IMAGEKIT_PRIVATE_KEY!,
+  urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT!
+})
 
-export default imagekit;
+export default imagekit

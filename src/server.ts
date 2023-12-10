@@ -1,11 +1,11 @@
-import dotenv from "dotenv";
-import app from "./app";
-import { db } from "./config/db";
+import dotenv from 'dotenv'
+import app from './app'
+import { db } from './config/db'
 
-dotenv.config();
+dotenv.config()
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT ?? 5000
 
-db();
+void db()
 
-app.listen(port, () => console.log(`Server is running on port ${port}`));
+app.listen(port, () => { console.log(`Server is running on port ${port}`) })
