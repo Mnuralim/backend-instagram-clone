@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -16,7 +7,7 @@ exports.followUser = exports.getUserByEmail = exports.updateUser = exports.getUs
 const user_1 = __importDefault(require("../models/user"));
 const apiError_1 = __importDefault(require("../utils/apiError"));
 const imagekit_1 = __importDefault(require("../utils/imagekit"));
-const getAllUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const getAllUsers = async (req, res, next) => {
     const { suggestion, username } = req.query;
     try {
         let suggestionOpt = false;
@@ -33,7 +24,7 @@ const getAllUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
             // eslint-disable-next-line @typescript-eslint/no-base-to-string
             filterData.username = { $regex: '.*' + username.toString() + '.*', $options: 'i' };
         }
-        const users = yield user_1.default.find(filterData).select('-password -refreshToken -passwordResetExpires -passwordResetToken -__v');
+        const users = await user_1.default.find(filterData).select('-password -refreshToken -passwordResetExpires -passwordResetToken -__v');
         const allUsers = users
             .map((user) => {
             const alreadyFollow = user.follower.find((el) => { var _a; return el.toString() === ((_a = req.user._id) === null || _a === void 0 ? void 0 : _a.toString()); });
@@ -55,12 +46,12 @@ const getAllUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     catch (error) {
         next(new apiError_1.default(error.message, 500));
     }
-});
+};
 exports.getAllUsers = getAllUsers;
-const getUserById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const getUserById = async (req, res, next) => {
     const { id } = req.params;
     try {
-        const user = (yield user_1.default.findById(id).select('-password -refreshToken -passwordResetExpires -passwordResetToken -__v'));
+        const user = (await user_1.default.findById(id).select('-password -refreshToken -passwordResetExpires -passwordResetToken -__v'));
         const alreadyFollow = user.follower.find((el) => { var _a; return el.toString() === ((_a = req.user._id) === null || _a === void 0 ? void 0 : _a.toString()); });
         res.status(200).json({
             success: true,
@@ -72,14 +63,14 @@ const getUserById = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     catch (error) {
         next(new apiError_1.default(error.message, 500));
     }
-});
+};
 exports.getUserById = getUserById;
-const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const updateUser = async (req, res, next) => {
     const { _id } = req.user;
     const { fullName, username, bio, link } = req.body;
     try {
-        const user = yield user_1.default.findById(_id);
-        const findUsername = yield user_1.default.findOne({ username });
+        const user = await user_1.default.findById(_id);
+        const findUsername = await user_1.default.findOne({ username });
         if (!user) {
             next(new apiError_1.default('User not found', 404));
             return;
@@ -93,7 +84,7 @@ const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         if (file) {
             const split = file.originalname.split('.');
             const ext = split[split.length - 1];
-            const uploadedImage = yield imagekit_1.default.upload({
+            const uploadedImage = await imagekit_1.default.upload({
                 file: file.buffer,
                 fileName: `IMG-USER-PROFILE${Date.now()}.${ext}`,
                 folder: 'instagram-clone/user_profile'
@@ -108,7 +99,7 @@ const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         user.profile.fullName = fullName;
         user.profile.link = link;
         user.username = username;
-        yield user.save();
+        await user.save();
         res.status(201).json({
             success: true,
             message: 'Updated user successfully'
@@ -117,12 +108,12 @@ const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     catch (error) {
         next(new apiError_1.default(error.message, 500));
     }
-});
+};
 exports.updateUser = updateUser;
-const getUserByEmail = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const getUserByEmail = async (req, res, next) => {
     const { email } = req.params;
     try {
-        const user = yield user_1.default.findOne({ email }).select('-password -refreshToken -passwordResetExpires -passwordResetToken -__v');
+        const user = await user_1.default.findOne({ email }).select('-password -refreshToken -passwordResetExpires -passwordResetToken -__v');
         if (!user) {
             next(new apiError_1.default('User not found', 404));
             return;
@@ -137,14 +128,14 @@ const getUserByEmail = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
     catch (error) {
         next(new apiError_1.default(error.message, 500));
     }
-});
+};
 exports.getUserByEmail = getUserByEmail;
-const followUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const followUser = async (req, res, next) => {
     const { _id: currentUserId } = req.user;
     const { id: targetUserId } = req.params;
     try {
-        const currentUser = yield user_1.default.findById(currentUserId);
-        const targetUser = yield user_1.default.findById(targetUserId);
+        const currentUser = await user_1.default.findById(currentUserId);
+        const targetUser = await user_1.default.findById(targetUserId);
         if (!currentUser || !targetUser) {
             next(new apiError_1.default('User not found', 404));
             return;
@@ -161,8 +152,8 @@ const followUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             // update number of follower and following
             currentUser.totalFollowing = currentUser.following.length;
             targetUser.totalFollower = targetUser.follower.length;
-            yield currentUser.save();
-            yield targetUser.save();
+            await currentUser.save();
+            await targetUser.save();
             message = 'You are follow this user';
         }
         else {
@@ -173,8 +164,8 @@ const followUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             // update number of follower and following
             currentUser.totalFollowing = currentUser.following.length;
             targetUser.totalFollower = targetUser.follower.length;
-            yield currentUser.save();
-            yield targetUser.save();
+            await currentUser.save();
+            await targetUser.save();
             message = 'You are unfollow this user';
         }
         res.status(200).json({
@@ -185,5 +176,5 @@ const followUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     catch (error) {
         next(new apiError_1.default(error.message, 500));
     }
-});
+};
 exports.followUser = followUser;
